@@ -1,0 +1,23 @@
+name: tmate Demo
+
+on:
+  workflow_dispatch:
+
+jobs:
+  debug:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Setup tmate session
+      uses: mxschmitt/action-tmate@v3
+
+    # Các bước bạn muốn thực nghiệm bên trong VPS
+    - name: Show system info
+      run: |
+        uname -a
+        ls -la /
+        # thêm lệnh tùy bạn muốn
+
