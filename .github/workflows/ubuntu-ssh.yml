@@ -1,0 +1,32 @@
+name: Ubuntu SSH VPS
+on:
+  workflow_dispatch:  # Chạy thủ công
+jobs:
+  ssh:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Setup SSH
+      run: |
+        sudo apt update
+        sudo apt install -y openssh-server
+        sudo service ssh start
+        sudo sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
+        sudo sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config
+        echo 'root:password123' | sudo chpasswd  # Đổi mật khẩu nếu muốn
+        sudo service ssh restart
+    - name: Start SSH via Ngrok
+      run: |
+        # Cài ngrok
+        wget https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-amd64.tgz
+        tar xvzf ngrok-v3-stable-linux-amd64.tgz
+        sudo ./ngrok authtoken $NGROK_TOKEN
+        # Tạo tunnel SSH (port 22)
+        ./ngrok tcp 22 --log=stdout > ngrok.log &
+        sleep 10  # Đợi ngrok khởi động
+        # In địa chỉ SSH
+        grep -o 'tcp://.*\.ngrok.io:[0-9]*' ngrok.log | head -1 | sed 's/tcp:\/\//ssh root@/' | sed 's/:/ -p /' | tee connect.txt
+        echo "Kết nối SSH: $(cat connect.txt)"
+    - name: Keep Alive 1 Hour
+      run: sleep 3600  # 1 giờ = 3600 giây
+      env:
+        NGROK_TOKEN: ${{ secrets.NGROK_TOKEN }}  # Thêm secret sau
