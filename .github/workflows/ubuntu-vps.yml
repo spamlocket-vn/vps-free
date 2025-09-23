@@ -1,4 +1,4 @@
-name: Ubuntu VPS
+name: Free Ubuntu VPS
 
 on: workflow_dispatch
 
@@ -6,14 +6,18 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Setup SSH
+      - name: Setup SSH + Tunnel
         run: |
           sudo apt update
-          sudo apt install -y openssh-server curl wget
+          sudo apt install -y openssh-server wget curl
           sudo service ssh start
           echo "root:123456" | sudo chpasswd
+          
           wget https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 -O cloudflared
           chmod +x cloudflared
-          ./cloudflared tunnel --url ssh://localhost:22 --no-autoupdate > tunnel.log 2>&1 &
-          sleep 5
-          grep -o 'ssh://.*trycloudflare.com' tunnel.log
+          
+          ./cloudflared tunnel --url ssh://localhost:22 --no-autoupdate > log.txt 2>&1 &
+          sleep 10
+          
+          echo "==== SSH CONNECT INFO ===="
+          grep -o 'ssh://[^ ]*' log.txt
