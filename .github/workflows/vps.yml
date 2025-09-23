@@ -1,4 +1,4 @@
-name: 12 VPS Free
+name: 10 VPS Free
 
 on:
   workflow_dispatch:
@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        vps_id: [1,2,3,4,5,6,7,8,9,10,11,12]
+        vps_id: [1,2,3,4,5,6,7,8,9,10]
     steps:
       - name: Update & Install tmate
         run: |
