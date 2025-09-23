@@ -6,18 +6,23 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Setup SSH + Tunnel
+      - name: Setup SSH + Cloudflared Tunnel
         run: |
           sudo apt update
           sudo apt install -y openssh-server wget curl
           sudo service ssh start
+          
+          # set password root
           echo "root:123456" | sudo chpasswd
           
+          # download cloudflared
           wget https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 -O cloudflared
           chmod +x cloudflared
           
+          # run cloudflared in background
           ./cloudflared tunnel --url ssh://localhost:22 --no-autoupdate > log.txt 2>&1 &
-          sleep 10
           
-          echo "==== SSH CONNECT INFO ===="
-          grep -o 'ssh://[^ ]*' log.txt
+          # wait cho cloudflared lấy link
+          sleep 20
+          
+          echo "==== COPY THÔNG TIN NÀY DÁN VÀO TERMIUS =
