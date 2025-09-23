@@ -1,85 +1,61 @@
-name: 5 VPS Ubuntu
+name: 12 VPS Free
 
 on:
   workflow_dispatch:
 
 jobs:
-  vps1:
+  vps:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        vps_id: [1,2,3,4,5,6,7,8,9,10,11,12]
     steps:
-      - name: Install tmate (VPS1)
+      - name: Update & Install tmate
         run: |
           sudo apt update
-          sudo apt install -y tmate
-          tmate -S /tmp/tmate.sock new-session -d
-          tmate -S /tmp/tmate.sock wait tmate-ready
-          echo "🔑 VPS1 SSH:"
-          tmate -S /tmp/tmate.sock display -p '#{tmate_ssh}'
-          echo "🌐 VPS1 Web:"
-          tmate -S /tmp/tmate.sock display -p '#{tmate_web}'
-      - name: Keep alive
-        run: sleep 6h
+          sudo apt install -y tmate curl wget gnupg
 
-  vps2:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Install tmate (VPS2)
+      - name: Cài Node.js + npm
         run: |
-          sudo apt update
-          sudo apt install -y tmate
-          tmate -S /tmp/tmate.sock new-session -d
-          tmate -S /tmp/tmate.sock wait tmate-ready
-          echo "🔑 VPS2 SSH:"
-          tmate -S /tmp/tmate.sock display -p '#{tmate_ssh}'
-          echo "🌐 VPS2 Web:"
-          tmate -S /tmp/tmate.sock display -p '#{tmate_web}'
-      - name: Keep alive
-        run: sleep 6h
+          curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
+          sudo apt-get install -y nodejs
+          node -v
+          npm -v
 
-  vps3:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Install tmate (VPS3)
+      - name: Cài Google Chrome
         run: |
-          sudo apt update
-          sudo apt install -y tmate
-          tmate -S /tmp/tmate.sock new-session -d
-          tmate -S /tmp/tmate.sock wait tmate-ready
-          echo "🔑 VPS3 SSH:"
-          tmate -S /tmp/tmate.sock display -p '#{tmate_ssh}'
-          echo "🌐 VPS3 Web:"
-          tmate -S /tmp/tmate.sock display -p '#{tmate_web}'
-      - name: Keep alive
-        run: sleep 6h
+          wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+          sudo apt install -y ./google-chrome-stable_current_amd64.deb
+          google-chrome --version
 
-  vps4:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Install tmate (VPS4)
+      - name: Cài thư viện Node (global)
         run: |
-          sudo apt update
-          sudo apt install -y tmate
-          tmate -S /tmp/tmate.sock new-session -d
-          tmate -S /tmp/tmate.sock wait tmate-ready
-          echo "🔑 VPS4 SSH:"
-          tmate -S /tmp/tmate.sock display -p '#{tmate_ssh}'
-          echo "🌐 VPS4 Web:"
-          tmate -S /tmp/tmate.sock display -p '#{tmate_web}'
-      - name: Keep alive
-        run: sleep 6h
+          npm install -g \
+            yarn \
+            pm2 \
+            puppeteer \
+            puppeteer-extra \
+            puppeteer-extra-plugin-stealth \
+            puppeteer-real-browser \
+            axios \
+            express
 
-  vps5:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Install tmate (VPS5)
+      - name: Tải raw.js từ repo
         run: |
-          sudo apt update
-          sudo apt install -y tmate
+          wget -O raw.js "https://raw.githubusercontent.com/spamlocket-vn/vps-free/main/raw.js"
+          ls -lh raw.js
+          echo "📂 File raw.js đã được tải về, bạn SSH vào rồi chạy: node raw.js"
+
+      - name: Start tmate (VPS${{ matrix.vps_id }})
+        run: |
           tmate -S /tmp/tmate.sock new-session -d
           tmate -S /tmp/tmate.sock wait tmate-ready
-          echo "🔑 VPS5 SSH:"
+          echo "🔑 VPS${{ matrix.vps_id }} SSH:"
           tmate -S /tmp/tmate.sock display -p '#{tmate_ssh}'
-          echo "🌐 VPS5 Web:"
+          echo "🌐 VPS${{ matrix.vps_id }} Web:"
           tmate -S /tmp/tmate.sock display -p '#{tmate_web}'
-      - name: Keep alive
-        run: sleep 6h
+
+      - name: Keep alive 1h
+        run: |
+          echo "✅ VPS${{ matrix.vps_id }} đã sẵn sàng (có sẵn raw.js)."
+          sleep 1h
