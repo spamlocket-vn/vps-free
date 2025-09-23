@@ -1,4 +1,4 @@
-name: Ubuntu VPS SSH
+name: Ubuntu VPS
 
 on: workflow_dispatch
 
@@ -6,28 +6,24 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Cài đặt SSH
-        run: |
-          sudo apt update -y
-          sudo apt install -y openssh-server wget unzip
-          sudo service ssh start
+      - name: Cập nhật hệ thống
+        run: sudo apt update -y
 
       - name: Tạo user & password
         run: |
+          sudo useradd -m runner || true
           echo "runner:MyVps220" | sudo chpasswd
+          sudo usermod -aG sudo runner
 
-      - name: Cài Ngrok
+      - name: Cài Ngrok mới nhất
         run: |
-          wget https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-amd64.zip
-          unzip ngrok-stable-linux-amd64.zip
+          wget https://github.com/ngrok/ngrok/releases/latest/download/ngrok-linux-amd64.zip
+          unzip ngrok-linux-amd64.zip
           ./ngrok authtoken ${{ secrets.NGROK_AUTH_TOKEN }}
 
       - name: Mở SSH Tunnel
         run: |
-          ./ngrok tcp 22 &
+          ./ngrok tcp 22 > ngrok.log &
           sleep 10
-          echo "==== SSH Login Info ===="
-          curl --silent --show-error http://127.0.0.1:4040/api/tunnels | jq -r '.tunnels[0].public_url'
-          echo "User: runner"
-          echo "Pass: MyVps220"
-          sleep infinity
+          curl --retry 5 --retry-delay 3 --max-time 20 -s http://127.0.0.1:4040/api/tunnels > tunnels.json
+          cat tunnels.json
