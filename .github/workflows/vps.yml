@@ -1,27 +1,85 @@
-name: Free VPS Ubuntu
+name: 5 VPS Ubuntu
 
 on:
-  workflow_dispatch:   # Bấm nút Run workflow để khởi động
+  workflow_dispatch:
 
 jobs:
-  build:
+  vps1:
     runs-on: ubuntu-latest
     steps:
-      - name: Update & Install tmate
+      - name: Install tmate (VPS1)
         run: |
           sudo apt update
           sudo apt install -y tmate
-
-      - name: Start tmate session
-        run: |
           tmate -S /tmp/tmate.sock new-session -d
           tmate -S /tmp/tmate.sock wait tmate-ready
-          echo "🔑 SSH Link:" 
+          echo "🔑 VPS1 SSH:"
           tmate -S /tmp/tmate.sock display -p '#{tmate_ssh}'
-          echo "🌐 Web Link:" 
+          echo "🌐 VPS1 Web:"
           tmate -S /tmp/tmate.sock display -p '#{tmate_web}'
+      - name: Keep alive
+        run: sleep 6h
 
-      - name: Giữ VPS chạy 6 tiếng
+  vps2:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install tmate (VPS2)
         run: |
-          echo "✅ VPS đang chạy, kết nối bằng SSH hoặc Web link ở trên."
-          sleep 6h
+          sudo apt update
+          sudo apt install -y tmate
+          tmate -S /tmp/tmate.sock new-session -d
+          tmate -S /tmp/tmate.sock wait tmate-ready
+          echo "🔑 VPS2 SSH:"
+          tmate -S /tmp/tmate.sock display -p '#{tmate_ssh}'
+          echo "🌐 VPS2 Web:"
+          tmate -S /tmp/tmate.sock display -p '#{tmate_web}'
+      - name: Keep alive
+        run: sleep 6h
+
+  vps3:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install tmate (VPS3)
+        run: |
+          sudo apt update
+          sudo apt install -y tmate
+          tmate -S /tmp/tmate.sock new-session -d
+          tmate -S /tmp/tmate.sock wait tmate-ready
+          echo "🔑 VPS3 SSH:"
+          tmate -S /tmp/tmate.sock display -p '#{tmate_ssh}'
+          echo "🌐 VPS3 Web:"
+          tmate -S /tmp/tmate.sock display -p '#{tmate_web}'
+      - name: Keep alive
+        run: sleep 6h
+
+  vps4:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install tmate (VPS4)
+        run: |
+          sudo apt update
+          sudo apt install -y tmate
+          tmate -S /tmp/tmate.sock new-session -d
+          tmate -S /tmp/tmate.sock wait tmate-ready
+          echo "🔑 VPS4 SSH:"
+          tmate -S /tmp/tmate.sock display -p '#{tmate_ssh}'
+          echo "🌐 VPS4 Web:"
+          tmate -S /tmp/tmate.sock display -p '#{tmate_web}'
+      - name: Keep alive
+        run: sleep 6h
+
+  vps5:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install tmate (VPS5)
+        run: |
+          sudo apt update
+          sudo apt install -y tmate
+          tmate -S /tmp/tmate.sock new-session -d
+          tmate -S /tmp/tmate.sock wait tmate-ready
+          echo "🔑 VPS5 SSH:"
+          tmate -S /tmp/tmate.sock display -p '#{tmate_ssh}'
+          echo "🌐 VPS5 Web:"
+          tmate -S /tmp/tmate.sock display -p '#{tmate_web}'
+      - name: Keep alive
+        run: sleep 6h
