@@ -50,5 +50,9 @@ jobs:
           echo "Pass: 123456"
           echo "==========================================="
 
-          # Giữ job chạy để SSH
-          tail -f log.txt
+          # Upload log.txt để kiểm tra
+          - name: Upload log file
+            uses: actions/upload-artifact@v3
+            with:
+              name: log-file
+              path: log.txt
