@@ -1,0 +1,30 @@
+name: TaoVPSUbuntu
+on:
+  workflow_dispatch:
+    inputs:
+      authcode:
+        description: 'Nhập authcode từ ngrok'
+        required: true
+      password:
+        description: 'Nhập mật khẩu cho VNC/SSH (tùy ý)'
+        required: true
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Cài đặt môi trường
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y tightvncserver wget unzip
+        wget https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-amd64.zip
+        unzip ngrok-v3-stable-linux-amd64.zip
+        chmod +x ngrok
+        ./ngrok authtoken ${{ github.event.inputs.authcode }}
+    - name: Khởi động VNC và SSH
+      run: |
+        echo "${{ github.event.inputs.password }}" | vncpasswd -f > vnc-passwd
+        tightvncserver :1 -geometry 1280x720 -depth 24
+        ./ngrok tcp 5901
+    - name: Giữ VPS chạy
+      run: ./time.sh
