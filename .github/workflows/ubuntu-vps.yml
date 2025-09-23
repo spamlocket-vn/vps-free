@@ -8,21 +8,45 @@ jobs:
     steps:
       - name: Setup SSH + Cloudflared Tunnel
         run: |
+          set -e
+
           sudo apt update
           sudo apt install -y openssh-server wget curl
           sudo service ssh start
-          
-          # set password root
+
+          # set password root (thay đổi nếu muốn)
           echo "root:123456" | sudo chpasswd
-          
+
           # download cloudflared
           wget https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 -O cloudflared
           chmod +x cloudflared
-          
-          # run cloudflared in background
+
+          # run cloudflared in background and log output
           ./cloudflared tunnel --url ssh://localhost:22 --no-autoupdate > log.txt 2>&1 &
-          
-          # wait cho cloudflared lấy link
-          sleep 20
-          
-          echo "==== COPY THÔNG TIN NÀY DÁN VÀO TERMIUS =
+
+          # give cloudflared some time to start
+          sleep 2
+
+          # wait up to ~60s for a trycloudflare.com ssh URL to appear in log
+          url=""
+          for i in {1..30}; do
+            url=$(grep -o 'ssh://[^ ]*trycloudflare.com' log.txt | head -n1 || true)
+            if [ -n "$url" ]; then
+              break
+            fi
+            sleep 2
+          done
+
+          echo "==== COPY THÔNG TIN NÀY DÁN VÀO TERMIUS ===="
+          if [ -n "$url" ]; then
+            echo "$url"
+          else
+            echo "Không tìm thấy link trycloudflare trong log. Đây 20 dòng cuối của log:"
+            tail -n 20 log.txt
+          fi
+          echo "User: root"
+          echo "Pass: 123456"
+          echo "==========================================="
+
+          # giữ job chạy để bạn có thể SSH; cancel workflow trong GitHub để dừng
+          tail -f log.txt
