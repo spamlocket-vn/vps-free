@@ -1,58 +1,17 @@
 name: Free Ubuntu VPS
 
-on: workflow_dispatch
+on:
+  workflow_dispatch:   # Cho phép chạy thủ công
+  push:                # Hoặc khi push code
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Setup SSH + Cloudflared Tunnel
+      - name: Set up VPS
         run: |
-          set -e
-
-          # Cập nhật và cài đặt SSH
-          sudo apt update
-          sudo apt install -y openssh-server
-          sudo service ssh start
-
-          # Đặt mật khẩu root
-          echo "root:123456" | sudo chpasswd
-
-          # Cài Cloudflared
-          wget https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 -O cloudflared
-          chmod +x cloudflared
-
-          # Chạy Cloudflared và log
-          ./cloudflared tunnel --url ssh://localhost:22 --no-autoupdate --loglevel debug > log.txt 2>&1 &
-
-          # Đợi khởi động
-          sleep 10
-
-          # Tìm URL SSH
-          url=""
-          for i in {1..30}; do
-            url=$(grep -o 'ssh://[^ ]*trycloudflare.com' log.txt | head -n1 || true)
-            if [ -n "$url" ]; then
-              break
-            fi
-            sleep 2
-          done
-
-          # Hiển thị thông tin
-          echo "==== COPY THÔNG TIN NÀY DÁN VÀO TERMIUS ===="
-          if [ -n "$url" ]; then
-            echo "$url"
-          else
-            echo "Không tìm thấy link SSH. Xem 20 dòng cuối log:"
-            tail -n 20 log.txt
-          fi
-          echo "User: root"
-          echo "Pass: 123456"
-          echo "==========================================="
-
-          # Upload log.txt để kiểm tra
-          - name: Upload log file
-            uses: actions/upload-artifact@v3
-            with:
-              name: log-file
-              path: log.txt
+          sudo apt update && sudo apt upgrade -y
+          sudo apt install neofetch tmux tmate -y
+          echo "VPS Ubuntu đã sẵn sàng!"
+      - name: Start tmate session
+        uses: mxschmitt/action-tmate@v3
