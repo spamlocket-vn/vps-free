@@ -1,4 +1,4 @@
-name: 15 VPS Free
+name: 15 VPS Free Consolidated
 
 on:
   workflow_dispatch:
@@ -6,9 +6,6 @@ on:
 jobs:
   vps:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        vps_id: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]
     steps:
       - name: Update & Install tmate
         run: |
@@ -48,16 +45,19 @@ jobs:
           ls -lh raw.js
           echo "📂 File raw.js đã được tải về, bạn SSH vào rồi chạy: node raw.js"
 
-      - name: Start tmate (VPS${{ matrix.vps_id }})
+      - name: Start 15 tmate sessions
         run: |
-          tmate -S /tmp/tmate.sock new-session -d
-          tmate -S /tmp/tmate.sock wait tmate-ready
-          echo "🔑 VPS${{ matrix.vps_id }} SSH:"
-          tmate -S /tmp/tmate.sock display -p '#{tmate_ssh}'
-          echo "🌐 VPS${{ matrix.vps_id }} Web:"
-          tmate -S /tmp/tmate.sock display -p '#{tmate_web}'
+          mkdir -p /tmp/tmate
+          for i in {1..15}; do
+            tmate -S /tmp/tmate/tmate-$i.sock new-session -d
+            tmate -S /tmp/tmate/tmate-$i.sock wait tmate-ready
+            echo "🔑 VPS$i SSH: $(tmate -S /tmp/tmate/tmate-$i.sock display -p '#{tmate_ssh}')"
+            echo "🌐 VPS$i Web: $(tmate -S /tmp/tmate/tmate-$i.sock display -p '#{tmate_web}')"
+          done > /tmp/tmate-links.txt
+          echo "✅ All 15 VPS sessions are ready. SSH and Web links:"
+          cat /tmp/tmate-links.txt
 
       - name: Keep alive 2h
         run: |
-          echo "✅ VPS${{ matrix.vps_id }} đã sẵn sàng (có sẵn raw.js)."
+          echo "✅ All 15 VPS sessions are ready (raw.js available)."
           sleep 2h
