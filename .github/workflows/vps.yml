@@ -1,4 +1,4 @@
-name: 10 VPS Free
+name: 15 VPS Free
 
 on:
   workflow_dispatch:
@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        vps_id: [1,2,3,4,5,6,7,8,9,10]
+        vps_id: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]
     steps:
       - name: Update & Install tmate
         run: |
@@ -55,7 +55,7 @@ jobs:
           echo "🌐 VPS${{ matrix.vps_id }} Web:"
           tmate -S /tmp/tmate.sock display -p '#{tmate_web}'
 
-      - name: Keep alive 1h
+      - name: Keep alive 2h
         run: |
           echo "✅ VPS${{ matrix.vps_id }} đã sẵn sàng (có sẵn raw.js)."
-          sleep 1h
+          sleep 2h
