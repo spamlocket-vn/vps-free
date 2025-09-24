@@ -39,6 +39,8 @@ jobs:
             puppeteer-real-browser \
             axios \
             express
+          echo "puppeteer-real-browser version:"
+          npm list -g puppeteer-real-browser
 
       - name: Tải raw.js từ repo
         run: |
